@@ -1,42 +1,36 @@
-import React, {ChangeEvent, useState} from 'react';
-import './App.css';
-import Counter from "./Components/Counter/counter";
+import React, {useState} from 'react';
+import style from './css.module.css';
+import Header from "./Components/Header/Header";
+
+import Footer from "./Components/Footer/Footer";
+import Settings from "./Components/Settings/Settings";
 
 function App() {
 
-    let [error,setError] = useState<string | null>(null)
-    let [value, setValue] = useState(0)
-    let [maxcount, setMaxcount] = useState(5)
-
-
-    let ButtonGo = () => {
-        value += 1
-        setValue(value)
-        if (value === maxcount)
-        {
-            setError('Максимальное значение');
-        }
-
+    let [value,setValue] = useState<number>(0)
+    function AddValueCounter() {
+        setValue(value += 1)
     }
-    let ButtonReset = () => {
+    function ResetCounter() {
         setValue(0)
-        setError('')
     }
-    let SetMax = (event: ChangeEvent<HTMLInputElement>) => {
-        let max = event.currentTarget.value
-        setMaxcount(Number(max))
+    function ChangeMaxValue() {
     }
-  return (
-    <div className="App">
-      <Counter
-        SetMax = {SetMax}
-        maxcount ={maxcount}
-        value = {value}
-        error = {error}
-        ButtonGo = {ButtonGo}
-        ButtonReset= {ButtonReset} />
-    </div>
-  );
+    function ChangeStartValue(startvalue:number) {
+        setValue(startvalue)
+    }
+    return (
+        <div className={style.App}>
+            <Header value_counter={value}/>
+            <Settings
+                AddValueCounter={AddValueCounter}
+                ResetCounter={ResetCounter}
+                ChangeStartValue={ChangeStartValue}/>
+            <Footer/>
+
+        </div>)
+
+
 }
 
 export default App;
