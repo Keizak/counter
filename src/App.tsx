@@ -5,6 +5,7 @@ import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
 import Settings from "./Components/Settings/Settings";
 import {rerenderEntireTree} from "./render";
+import {useLocalStorage} from "./render - Copy";
 
 
 type AppType =
@@ -17,12 +18,13 @@ type AppType =
     }
 
 function App(props: AppType) {
-    let a = String(props.state.Header.MaxValue)
-    let b = String(props.state.Header.StartValue)
-    let [start, setStart] = useState<string>(b)
-    let [max, setMax] = useState<string>(a)
-    let [value, setValue] = useState<string>("0")
-    let [color, setColor] = useState<string>("white")
+    // let [start, setStart] = useState<string>(String(props.state.Header.StartValue))
+    // let [max, setMax] = useState<string>(String(props.state.Header.MaxValue))
+    let [start, setStart] = useLocalStorage("StartValue", String(props.state.Header.StartValue))
+    let [max, setMax] = useLocalStorage("MaxValue", String(props.state.Header.StartValue))
+    let [value, setValue] = useState<string>(start)
+    // let [color, setColor] = useState<string>("white")
+    let [color, setColor]=  useLocalStorage("Color", "White")
     let [error, setError] = useState<boolean>(false)
 
     function AddValueCounter() {
@@ -30,7 +32,7 @@ function App(props: AppType) {
             id: "1", height: "100px", width: "100px", backgroundColor: "green",
             content: "start", borderRadius: "100%", disabled: true
         }
-        let chislo = String(Number(value )+ 1)
+        let chislo = String(Number(value) + 1)
         if (Number(chislo) === Number(max)) {
             setError(true)
             props.state.Header.buttons_Start_Reset.shift()
@@ -38,7 +40,6 @@ function App(props: AppType) {
             rerenderEntireTree(props.state)
         }
         setValue(chislo)
-        rerenderEntireTree(props.state)
     }
 
     function ResetCounter() {
@@ -52,31 +53,50 @@ function App(props: AppType) {
         setError(false)
         rerenderEntireTree(props.state)
     }
-
-    function ErrorValues(inputerror:boolean) {
-        if (inputerror) {
-            setValue("Ошибка ввода")
-            rerenderEntireTree(props.state)
-        }
-        else {
-            setValue(props.state.Header.StartValue)
-            rerenderEntireTree(props.state)
-        }
-
-    }
-
     function ChangeMaxValue(maxvalue: string) {
-        setValue(props.state.Header.StartValue)
-        props.state.Header.MaxValue=setMax(maxvalue)
-        rerenderEntireTree(props.state)
+        props.state.Header.MaxValue = setMax(maxvalue)
     }
 
     function ChangeStartValue(startvalue: string) {
-        setValue(props.state.Header.StartValue)
-        props.state.Header.StartValue=setStart(startvalue)
-        rerenderEntireTree(props.state)
+        props.state.Header.StartValue = setStart(startvalue)
 
     }
+
+    function ErrorValues(inputerror: boolean) {
+        let disabled1 = {
+            id: "1", height: "100px", width: "100px", backgroundColor: "green",
+            content: "start", borderRadius: "100%", disabled: true
+        }
+        let disabled2 = {
+            id: "2", height: "100px", width: "100px", backgroundColor: "red",
+            content: "reset", borderRadius: "100%", disabled: true
+        }
+        let enabled1 = {
+            id: "1", height: "100px", width: "100px", backgroundColor: "green",
+            content: "start", borderRadius: "100%", disabled: false
+        }
+        let enabled2 = {
+            id: "2", height: "100px", width: "100px", backgroundColor: "red",
+            content: "reset", borderRadius: "100%", disabled: false
+        }
+        if (inputerror) {
+            props.state.Header.buttons_Start_Reset.shift()
+            props.state.Header.buttons_Start_Reset.shift()
+            props.state.Header.buttons_Start_Reset.unshift(disabled2)
+            props.state.Header.buttons_Start_Reset.unshift(disabled1)
+            setValue("Ошибка ввода")
+            rerenderEntireTree(props.state)
+        } else {
+            props.state.Header.buttons_Start_Reset.shift()
+            props.state.Header.buttons_Start_Reset.shift()
+            props.state.Header.buttons_Start_Reset.unshift(enabled2)
+            props.state.Header.buttons_Start_Reset.unshift(enabled1)
+            setValue(String(props.state.Settings.StartValue))
+        }
+
+    }
+
+
 
     function ChangeColorValue(selectedcolor: string) {
         setColor(selectedcolor)
@@ -103,11 +123,8 @@ function App(props: AppType) {
                       newStartValue={props.state.Settings.StartValue}
                       buttons_color={props.state.Settings.buttons_color}
             />
-            <Footer/>
 
         </div>)
-
-
 }
 
 export default App;
